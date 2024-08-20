@@ -110,6 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('pose_file')
     parser.add_argument('skinmap_file')
     parser.add_argument('-s', '--skin')
+    parser.add_argument('-o', '--output')
     args = parser.parse_args()
 
     pose = Image.open(args.pose_file)
@@ -118,4 +119,4 @@ if __name__ == '__main__':
 
     img = process_image(pose, skinmap, skin)
     # img.show()
-    img.save('image.png')
+    img.save(args.output if args.output is not None else 'image.png')
