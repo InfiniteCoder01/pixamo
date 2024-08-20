@@ -2,7 +2,7 @@ from PIL.Image import Image
 from typedefs import *
 
 
-def find_bone(pose: Image, color: Color):
+def find_bone(pose: Image, color: Color) -> list[IVec] | None:
     width, height = pose.size
     pixels = pose.load()
 
@@ -28,7 +28,9 @@ def find_bone(pose: Image, color: Color):
 
     origin = tuple(max(channel + 1 if channel == 255 else channel, 64) - 64 if i != 3 else channel for i, channel in
                    enumerate(color))
-    origin = [(x, y) for x in range(width) for y in range(height) if pixels[x, y] == origin][0]
+    origin = [(x, y) for x in range(width) for y in range(height) if pixels[x, y] == origin]
+    if len(origin) > 0: origin = origin[0]
+    else: return None
 
     line = []
     v = origin
@@ -36,9 +38,12 @@ def find_bone(pose: Image, color: Color):
         line.append(v)
         visited[v[1]][v[0]] = True
         points = neighbours(v)
-        points = filter(lambda point: 0 <= point[0] < width and 0 <= point[1] < height,
-                        points)
-        points = list(filter(lambda point: not visited[point[1]][point[0]] and pixels[point] == color, points))
-        if len(points) == 0: break
-        v = max(points, key=lambda point: count_neighbours(point))
+        points = list(filter(lambda point: not visited[point[1]][point[0]], points))
+        potential_next = list(filter(lambda point: pixels[point] == color, points))
+        if len(potential_next) == 0:
+            for point in points:
+                if count_neighbours(point) > 0:
+                    potential_next.append(point)
+            if len(potential_next) == 0: break
+        v = max(potential_next, key=lambda point: count_neighbours(point))
     return line
