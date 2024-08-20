@@ -1,5 +1,6 @@
 from PIL import Image
 import math
+import argparse
 
 from typedefs import *
 from pose import find_bone as find_pose_bone
@@ -13,10 +14,6 @@ defs = {
     "larm": ((0, 128, 0, 255), False, True),
     "lleg": ((0, 0, 128, 255), False, True),
 }
-
-pose = Image.open("pose.png")
-skinmap = Image.open("skinmap.png")
-skin = Image.open("skin.png").load()
 
 
 def draw_line(pixels, a: IVec, b: IVec, color: Color):
@@ -32,7 +29,7 @@ def draw_line(pixels, a: IVec, b: IVec, color: Color):
         a = (a[0] + step[0], a[1] + step[1])
 
 
-def process_image(pose: Image) -> Image:
+def process_image(pose: Image, skinmap: Image, skin) -> Image:
     img = Image.new("RGBA", pose.size, (0, 0, 0, 0))
     pixels = img.load()
 
@@ -78,24 +75,47 @@ def process_image(pose: Image) -> Image:
                     else len(row) / 2 - (1 if line[-1][0] > line[0][0] else 0)
                 )
                 row_cords = []
+
+                def pixel_color(pixel: IVec) -> Color:
+                    if skin is not None:
+                        return skin[pixel]
+                    else:
+                        return pixel + (0, 255)
+
                 for (i, pixel) in enumerate(row):
                     coord = (point[0] + x_axis[0] * (i - offset), point[1] + x_axis[1] * (i - offset))
                     row_cords.append(coord)
                     if pixel:
-                        # pixels[coord] = skin[pixel]  # color
+                        # pixels[coord] = pixel_color(pixel)
                         if h_strips:
-                            pixels[coord] = skin[pixel]  # color
+                            pixels[coord] = pixel_color(pixel)
                         else:
-                            draw_line(pixels, last_row[round(i / len(row) * len(last_row))] if last_row else coord, coord, skin[pixel])  # color
+                            draw_line(pixels, last_row[round(i / len(row) * len(last_row))] if last_row else coord,
+                                      coord, pixel_color(pixel))
                 if not h_strips and abs(normal[0]) == abs(normal[1]):
                     points = sorted(zip(row_cords, row), key=lambda point: point[0][1])
                     for (point, pixel) in points[:-1]:
-                        pixels[point[0], point[1] + 1] = skin[pixel]  # color
+                        pixels[point[0], point[1] + 1] = pixel_color(pixel)
                     for (point, pixel) in points[1:]:
-                        pixels[point[0], point[1] - 1] = skin[pixel]  # color
+                        pixels[point[0], point[1] - 1] = pixel_color(pixel)
                 last_row = row_cords
     return img
 
-img = process_image(pose)
-# img.show()
-img.save('image.png')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        prog='pixamo',
+        description='Generates sprites from pixel art skeleton')
+
+    parser.add_argument('pose_file')
+    parser.add_argument('skinmap_file')
+    parser.add_argument('-s', '--skin')
+    args = parser.parse_args()
+
+    pose = Image.open(args.pose_file)
+    skinmap = Image.open(args.skinmap_file)
+    skin = Image.open(args.skin).load() if args.skin is not None else None
+
+    img = process_image(pose, skinmap, skin)
+    # img.show()
+    img.save('image.png')
