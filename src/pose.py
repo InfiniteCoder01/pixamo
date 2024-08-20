@@ -28,22 +28,20 @@ def find_bone(pose: Image, color: Color) -> list[IVec] | None:
 
     origin = tuple(max(channel + 1 if channel == 255 else channel, 64) - 64 if i != 3 else channel for i, channel in
                    enumerate(color))
-    origin = [(x, y) for x in range(width) for y in range(height) if pixels[x, y] == origin]
-    if len(origin) > 0: origin = origin[0]
-    else: return None
-
-    line = []
-    v = origin
-    while True:
-        line.append(v)
-        visited[v[1]][v[0]] = True
-        points = neighbours(v)
-        points = list(filter(lambda point: not visited[point[1]][point[0]], points))
-        potential_next = list(filter(lambda point: pixels[point] == color, points))
-        if len(potential_next) == 0:
-            for point in points:
-                if count_neighbours(point) > 0:
-                    potential_next.append(point)
-            if len(potential_next) == 0: break
-        v = max(potential_next, key=lambda point: count_neighbours(point))
-    return line
+    origins = [(x, y) for x in range(width) for y in range(height) if pixels[x, y] == origin]
+    for origin in origins:
+        line = []
+        v = origin
+        while True:
+            line.append(v)
+            visited[v[1]][v[0]] = True
+            points = neighbours(v)
+            points = list(filter(lambda point: not visited[point[1]][point[0]], points))
+            potential_next = list(filter(lambda point: pixels[point] == color, points))
+            if len(potential_next) == 0:
+                for point in points:
+                    if count_neighbours(point) > 0:
+                        potential_next.append(point)
+                if len(potential_next) == 0: break
+            v = max(potential_next, key=lambda point: count_neighbours(point))
+        yield line
