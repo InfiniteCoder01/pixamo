@@ -8,7 +8,7 @@
       (system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in {
-        defaultPackage = pkgs.python3Packages.buildPythonPackage rec {
+        defaultPackage = pkgs.python3Packages.buildPythonPackage {
           name = "pixamo";
           pname = "pixamo";
           version = "0.1";
