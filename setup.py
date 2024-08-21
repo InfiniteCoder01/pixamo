@@ -9,6 +9,9 @@ setup(
     author_email='info@infinitecoder.org',
     license='MIT',
     packages=['pixamo'],
+    install_requires=[
+        'Pillow',
+    ],
     entry_points = {
         'console_scripts': ['pixamo=pixamo:main'],
     },
