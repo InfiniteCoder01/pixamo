@@ -2,9 +2,9 @@ from PIL import Image
 import math
 import argparse
 
-from typedefs import *
-from pose import find_bone as find_pose_bone
-from skinmap import find_blob as find_skinmap_blob
+from pixamo.typedefs import *
+from pixamo.pose import find_bone as find_pose_bone
+from pixamo.skinmap import find_blob as find_skinmap_blob
 
 defs = {
     "head": ((255, 0, 0, 255), True, False),
@@ -101,8 +101,7 @@ def process_image(pose: Image, skinmap: Image, skin) -> Image:
                 last_row = row_cords
     return img
 
-
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(
         prog='pixamo',
         description='Generates sprites from pixel art skeleton')
@@ -120,3 +119,6 @@ if __name__ == '__main__':
     img = process_image(pose, skinmap, skin)
     # img.show()
     img.save(args.output if args.output is not None else 'image.png')
+
+if __name__ == '__main__':
+    main()

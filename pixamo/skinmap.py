@@ -1,5 +1,5 @@
 from PIL.Image import Image
-from typedefs import *
+from pixamo.typedefs import *
 
 
 def find_blob(skinmap: Image, color: Color) -> list[list[IVec | None]]:

@@ -1,5 +1,5 @@
 from PIL.Image import Image
-from typedefs import *
+from pixamo.typedefs import *
 
 
 def find_bone(pose: Image, color: Color) -> list[IVec] | None:
