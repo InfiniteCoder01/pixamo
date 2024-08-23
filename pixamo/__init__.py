@@ -16,7 +16,12 @@ defs = {
 }
 
 
-def draw_line(pixels, a: IVec, b: IVec, color: Color):
+def put_pixel(image: Image.Image, pixels, point: IVec, color: Color):
+    if point[0] >= 0 and point[1] >= 0 and point[0] < image.size[0] and point[1] < image.size[1]:
+        pixels[point] = color
+
+
+def draw_line(image: Image.Image, pixels, a: IVec, b: IVec, color: Color):
     if a == b:
         pixels[a] = color
         return
@@ -25,7 +30,7 @@ def draw_line(pixels, a: IVec, b: IVec, color: Color):
     step = (step[0] / steps, step[1] / steps)
 
     for i in range(steps + 1):
-        pixels[round(a[0]), round(a[1])] = color
+        put_pixel(image, pixels, (round(a[0]), round(a[1])), color)
         a = (a[0] + step[0], a[1] + step[1])
 
 
@@ -86,18 +91,18 @@ def process_image(pose: Image, skinmap: Image, skin) -> Image:
                     coord = (point[0] + x_axis[0] * (i - offset), point[1] + x_axis[1] * (i - offset))
                     row_cords.append(coord)
                     if pixel:
-                        # pixels[coord] = pixel_color(pixel)
+                        # put_pixel(img, pixels, coord, pixel_color(pixel))
                         if h_strips:
-                            pixels[coord] = pixel_color(pixel)
+                            put_pixel(img, pixels, coord, pixel_color(pixel))
                         else:
-                            draw_line(pixels, last_row[round(i / len(row) * len(last_row))] if last_row else coord,
+                            draw_line(img, pixels, last_row[round(i / len(row) * len(last_row))] if last_row else coord,
                                       coord, pixel_color(pixel))
                 if not h_strips and abs(normal[0]) == abs(normal[1]):
                     points = sorted(zip(row_cords, row), key=lambda point: point[0][1])
                     for (point, pixel) in points[:-1]:
-                        pixels[point[0], point[1] + 1] = pixel_color(pixel)
+                        put_pixel(img, pixels, (point[0], point[1] + 1), pixel_color(pixel))
                     for (point, pixel) in points[1:]:
-                        pixels[point[0], point[1] - 1] = pixel_color(pixel)
+                        put_pixel(img, pixels, (point[0], point[1] - 1), pixel_color(pixel))
                 last_row = row_cords
     return img
 
