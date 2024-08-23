@@ -62,7 +62,8 @@ def process_image(pose: Image, skinmap: Image, skin) -> Image:
             for (i, point) in enumerate(line):
                 row = blob[round(i / len(line) * len(blob))]
                 if h_strips:
-                    normal = (0, 1)
+                    delta = (line[-1][0] - line[0][0], line[-1][1] - line[0][1])
+                    normal = (int(math.copysign(1, delta[0])), 0) if abs(delta[0]) > abs(delta[1]) else (0, int(math.copysign(1, delta[1])))
                 else:
                     normal = next_normal
                     next_normal = calculate_normal(i + 1) if i + 1 < len(line) else normal
