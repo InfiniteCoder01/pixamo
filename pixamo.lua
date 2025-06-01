@@ -65,7 +65,7 @@ function render(skin, image, skeleton, offset)
           if visited[p.x + p.y * skeleton.width] then return false end
           return skeleton:getPixel(p.x, p.y) == bone.secondary_color
         end
-        for r = 1, 100 do
+        for r = 1, 20 do
           for dx = 0, r do
             local p = Point(current.x - dx, current.y - r)
             if test(p) then return p end
