@@ -1,0 +1,17 @@
+{
+  "name": "pixamo",
+  "displayName": "Pixamo",
+  "description": "Pixel art character animations reimagined",
+  "version": "0.1",
+  "author": { "name": "InfiniteCoder",
+              "email": "info@infinitecoder.org",
+              "url": "https://infinitecoder.org/" },
+  "license": "MIT",
+  "categories": [ "Scripts" ],
+  "contributes": {
+    "scripts": [
+        { "path": "./main.lua" }
+    ]
+  }
+}
+

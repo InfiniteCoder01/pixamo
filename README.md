@@ -1,9 +1,16 @@
 # Pixamo
 Generates sprites from pixel art skeleton
-Made as a tool for my game for [OLC CodeJam 2024](https://itch.io/jam/olc-codejam-2024), can be used as a submission by itself :)
+Made originally in python as a tool for my game for
+[OLC CodeJam 2024](https://itch.io/jam/olc-codejam-2024),
+could be used as a submission by itself :)
+Was rewritten as an Aseprite extension later.
+Original python version: https://github.com/InfiniteCoder01/pixamo/tree/b55823266bc8e6cb334395a6bb073f74463088f3 
 
 # Usage
-Clone this repository, run `pip install .` to install it.
-Run `pixamo pose.png skinmap.png -s skin.png -o image.png` to map skin.png to pose.png using skinmap.png outputing image.png.
-Example files can be found [in example directory](https://github.com/InfiniteCoder01/pixamo/tree/master/example)
-If you are using nix, it is also available as a flake: `nix run github:InfiniteCoder01/pixamo -- pose.png skinmap.png -s skin.png -o image.png`
+Just download the extension file from releases and install it as a regular
+Aseprite extension. Right-click the layer to (re)generate sprites.
+Skin file name and layout is hardcoded, look at [examples](https://github.com/InfiniteCoder01/pixamo/tree/master/examples) to get started.
+
+# Example
+![Example skeleton](https://github.com/InfiniteCoder01/pixamo)
+![Example](https://github.com/InfiniteCoder01/pixamo)
