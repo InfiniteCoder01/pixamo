@@ -12,5 +12,5 @@ Aseprite extension. Right-click the layer to (re)generate sprites.
 Skin file name and layout is hardcoded, look at [examples](https://github.com/InfiniteCoder01/pixamo/tree/master/examples) to get started.
 
 # Example
-![Example skeleton](https://github.com/InfiniteCoder01/pixamo)
-![Example](https://github.com/InfiniteCoder01/pixamo)
+![Example pose](https://github.com/InfiniteCoder01/pixamo/raw/refs/heads/master/examples/human-pose.gif)
+![Example](https://github.com/InfiniteCoder01/pixamo/raw/refs/heads/master/examples/human.gif)
