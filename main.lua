@@ -3,7 +3,7 @@
 local pixamo = dofile "pixamo.lua"
 
 local function open_skin_file()
-  local spr = app.activeSprite
+  local spr = app.sprite
   if not spr then app.alert "There is no active sprite" return end
 
   local filename = app.fs.filePathAndTitle(spr.filename) .. ".skin." .. app.fs.fileExtension(spr.filename)
@@ -15,7 +15,7 @@ local function open_skin_file()
 
   local skin = app.open(filename)
   if not skin then app.alert "No skin file found" return end
-  app.activeSprite = spr
+  app.sprite = spr
   return skin
 end
 
@@ -31,57 +31,53 @@ local function load_skin()
   return skin
 end
 
----@param sprite Sprite
----@param name string
-local function find_gen_layer(sprite, name)
-    for _, sp_layer in ipairs(sprite.layers) do
-      if sp_layer.name == name then
+---@param layer Layer
+local function find_gen_layer(layer)
+    for _, sp_layer in ipairs(layer.sprite.layers) do
+      if sp_layer.name == layer.name .. " generated" then
         return sp_layer
       end
     end
-    local gen_layer = sprite:newLayer()
-    gen_layer.name = name
+    local gen_layer = layer.sprite:newLayer()
+    gen_layer.name = layer.name .. " generated"
     return gen_layer
 end
 
----@param one_cel boolean
-local function regenerate(one_cel)
+---@param skin Skin
+---@param cel Cel | nil
+---@param gen_layer Layer
+local function regenerate_cel(skin, cel, gen_layer)
+  if not cel then return end
+  if gen_layer:cel(cel.frameNumber) then gen_layer.sprite:deleteCel(gen_layer:cel(cel.frameNumber)) end
+
+  local image = Image(gen_layer.sprite.width, gen_layer.sprite.height, skin.colorMode)
+  pixamo.render(skin, image, cel.image, cel.position)
+
+  gen_layer.sprite:newCel(gen_layer, cel.frameNumber, image, Point(0, 0))
+end
+
+local function regenerate()
   local skin = load_skin()
   if not skin then return end
 
-  local sprite = app.activeSprite
-  if not sprite then app.alert "There is no active sprite" return end
-  local layer = app.activeLayer
-  if not layer then app.alert "There is no active layer" return end
-  if one_cel then
-    if not app.activeCel then app.alert "There is no active cel" return end
+  local cels = nil
+  if app.range and app.range.type == RangeType.CELS then
+    cels = app.range.cels
+  elseif app.layer then
+    cels = app.layer.cels
+  else
+    app.alert "Neither layer nor cels are selected"
+    return
   end
-
+  if #cels == 0 then return end
 
   app.transaction("Regenerate pixamo", function()
-    local gen_layer = find_gen_layer(sprite, layer.name .. " generated")
-
-    ---@param frame integer
-    local function regenerate_cel(frame)
-      local cel = layer:cel(frame)
-      if not cel then return end
-      if gen_layer:cel(frame) then sprite:deleteCel(gen_layer:cel(frame)) end
-
-      local image = Image(sprite.width, sprite.height, skin.colorMode)
-      pixamo.render(skin, image, cel.image, cel.position)
-
-      sprite:newCel(gen_layer, frame, image, Point(0, 0))
+    local layer = cels[1].layer
+    local gen_layer = find_gen_layer(layer)
+    for _, cel in ipairs(cels) do
+      regenerate_cel(skin, cel, gen_layer)
     end
-
-    if one_cel then
-      regenerate_cel(app.activeCel.frameNumber)
-    else
-      for _, frame in ipairs(sprite.frames) do
-        regenerate_cel(frame.frameNumber)
-      end
-    end
-
-    app.activeLayer = layer
+    app.layer = layer
   end)
   app.command.Refresh()
 end
@@ -91,13 +87,13 @@ function init(plugin)
     id="RegeneratePixamo",
     title="Regenerate pixamo",
     group="layer_popup_properties",
-    onclick=function() regenerate(false) end
+    onclick=regenerate
   }
   plugin:newCommand{
-    id="RegeneratePixamo",
+    id="RegeneratePixamoCels",
     title="Regenerate pixamo",
     group="cel_popup_properties",
-    onclick=function() regenerate(true) end
+    onclick=regenerate
   }
 end
 
