@@ -9,7 +9,11 @@ Was rewritten as an Aseprite extension later.
 # Usage
 Just download the extension file from releases and install it as a regular
 Aseprite extension. Right-click the layer to (re)generate sprites.
-Skin file name and layout is hardcoded, look at [examples](https://github.com/InfiniteCoder01/pixamo/tree/master/examples) to get started.
+Note: only RGBA color mode is supported!
+Bones are sorted by their top pixel coordinates, left-to-right top-to-bottom.
+This impacts draw order.
+If the bone is oriented the wrong way, put a black (`#000000`) pixel at the top.
+Look at [examples](https://github.com/InfiniteCoder01/pixamo/tree/master/examples) to get started.
 
 # Example
 ![Example pose](https://github.com/InfiniteCoder01/pixamo/raw/refs/heads/master/examples/human-pose.gif)
